@@ -7,7 +7,7 @@ from typing import Iterable, Iterator, Literal, Optional
 import requests_cache
 import uuid
 from dateutil import parser
-from starwars.settings import DROPPED_FIELDS
+from starwars.settings import DROPPED_PEOPLE_FIELDS
 from starwars.pages.client import ApiClient
 
 requests_cache.install_cache('starwars_cache')
@@ -40,8 +40,9 @@ class AbstractResource(ABC):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
+    @abstractmethod
     def exported_fields(self):
-        return {k: v for k, v in self.__dict__.items() if k not in DROPPED_FIELDS}
+        ...
 
 
 class StarWarsPlanet(AbstractResource):
@@ -51,6 +52,9 @@ class StarWarsPlanet(AbstractResource):
 
     def __repr__(self):
         return f'Planet: {self.name}'
+
+    def exported_fields(self):
+        ...
 
 
 class StarWarsPerson(AbstractResource):
@@ -70,6 +74,9 @@ class StarWarsPerson(AbstractResource):
     def get_homeworld(self) -> StarWarsPlanet:
         response = self.client.get(self.homeworld)
         return StarWarsPlanet(**response)
+
+    def exported_fields(self):
+        return {k: v for k, v in self.__dict__.items() if k not in DROPPED_PEOPLE_FIELDS}
 
 
 class ApiOrderIterator(Iterator):
