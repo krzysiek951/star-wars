@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="row">
+    <div class="col">
+        {% for message in messages %}
+        <div class="alert mb-3{% if message.tags %} {{ message.tags }}{% endif %}">{{ message }}</div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <h4 class="mb-3">Discover Star Wars characters!</h4>
+    </div>
+</div>
+<div class="row pt-2">
+    <div class="col">
+        <a href="{% url 'fetch_starwars_people' %}" class="btn btn-primary" role="button" aria-pressed="true">Fetch
+            new collection!</a>
+    </div>
+</div>
+<div class="row pt-5">
+    <div class="col">
+        <h5>Latest collections:</h5>
+    </div>
+</div>
+<div class="row py-3">
+    <div class="col">
+        <ul class="list-group list-group-flush">
+            {% for collection in collections %}
+            <li class="list-group-item">
+                <a href="./collection/{{collection.id}}">{{collection.created_at|date:"N d Y H:i a"}}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock content %}

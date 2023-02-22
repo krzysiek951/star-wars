@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" xmlns="http://www.w3.org/1999/html">
+{% load static %}
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <title>{% block title %} {% endblock %}</title>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!-- ========================= CSS ========================= -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <link href="{% static 'css/font-awesome-all.min.css' %}" rel="stylesheet">
+</head>
+
+<body>
+
+
+<!-- Preloader -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- /End Preloader -->
+
+
+<div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <span class="fs-2"><i class="fa-brands fa-galactic-republic pe-2"></i>Star Was Explorer</span>
+        </a>
+    </header>
+    {% block content %}
+    {% endblock %}
+</div>
+
+
+<!-- Start Footer Area -->
+<footer class="footer section">
+    <div class="container">
+        <div class="inner-content">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <p class="copyright-text text-center">Star Wars Explorer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!--/ End Footer Area -->
+
+
+<!-- ========================= scripts ========================= -->
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

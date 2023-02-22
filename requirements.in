@@ -1,0 +1,8 @@
+Django
+psycopg2
+requests
+requests-cache
+petl
+python-dateutil
+coverage
+pytest

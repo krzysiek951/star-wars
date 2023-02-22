@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <h3>Browse collection</h3>
+    </div>
+</div>
+<div class="row pt-2 pb-4">
+    <div class="col">
+        <a href="{% url 'home'%}"><i class="fa-solid fa-circle-arrow-left pe-2"></i>Back to collections</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <span>Selected columns to display</span>
+    </div>
+</div>
+<div class="row pb-3 pt-1">
+    <div class="col">
+        <div class="btn-group-toggle" data-toggle="buttons">
+            {% for column in collection_header %}
+            <a href="{% url 'collection' collection_id=user_collection.id %}?{% select_column request column %}"
+               class=" btn btn-sm {% if column in displayed_columns %} btn-primary {% else %} btn-outline-primary {% endif %}">
+                {{column}}
+            </a>
+            {% endfor %}
+            <a href="{{ request.path }}" class="btn btn-outline-dark btn-sm" role="button">
+                All
+            </a>
+        </div>
+    </div>
+</div>
+
+<div style="overflow-x:auto;">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            {% for col in displayed_header %}
+            <th>
+                <a href="{% url 'collection' collection_id=user_collection.id %}?{% sort_by request col %}"
+                   class="text-decoration-none">
+                    {{ col }}
+                    {% if col == request.GET.sort_by %}<i class="fa-solid fa-circle-chevron-up pe-1"></i>
+                    {% elif "-"|add:col == request.GET.sort_by %}<i class="fa-solid fa-circle-chevron-down pe-1"></i>
+                    {% endif %}
+                </a>
+            </th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in displayed_data %}
+        <tr>
+            {% for col in row %}
+            <td>{{ col }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if is_more_results %}
+<div class="py-3">
+    <div class="col">
+        <a href="{% url 'collection' collection_id=user_collection.id%}?{% display_more request %}"
+                class="btn btn-primary" role="button" aria-pressed="true">Load more</a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock content %}
