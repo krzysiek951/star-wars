@@ -21,9 +21,9 @@
     <div class="col">
         <div class="btn-group-toggle" data-toggle="buttons">
             {% for column in collection_header %}
-            <a href="{% url 'collection' collection_id=user_collection.id %}?{% select_column request column %}"
-               class=" btn btn-sm {% if column in displayed_columns %} btn-primary {% else %} btn-outline-primary {% endif %}">
-                {{column}}
+            <a href="{% url 'collection' collection_id=collection.id %}?{% select_column request column %}"
+               class=" btn btn-sm {% if column in displayed_header %} btn-primary {% else %} btn-outline-primary {% endif %}">
+                {% normalize_name column %}
             </a>
             {% endfor %}
             <a href="{{ request.path }}" class="btn btn-outline-dark btn-sm" role="button">
@@ -39,9 +39,9 @@
         <tr>
             {% for col in displayed_header %}
             <th>
-                <a href="{% url 'collection' collection_id=user_collection.id %}?{% sort_by request col %}"
+                <a href="{% url 'collection' collection_id=collection.id %}?{% sort_by request col %}"
                    class="text-decoration-none">
-                    {{ col }}
+                    {% normalize_name col %}
                     {% if col == request.GET.sort_by %}<i class="fa-solid fa-circle-chevron-up pe-1"></i>
                     {% elif "-"|add:col == request.GET.sort_by %}<i class="fa-solid fa-circle-chevron-down pe-1"></i>
                     {% endif %}
@@ -64,7 +64,7 @@
 {% if is_more_results %}
 <div class="py-3">
     <div class="col">
-        <a href="{% url 'collection' collection_id=user_collection.id%}?{% display_more request %}"
+        <a href="{% url 'collection' collection_id=collection.id%}?{% display_more request %}"
                 class="btn btn-primary" role="button" aria-pressed="true">Load more</a>
     </div>
 </div>

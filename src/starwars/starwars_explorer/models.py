@@ -7,14 +7,18 @@ from typing import Iterable, Iterator, Literal, Optional
 import requests_cache
 import uuid
 from dateutil import parser
+
 from starwars.settings import DROPPED_PEOPLE_FIELDS
 from starwars.pages.client import ApiClient
 
+from starwars.pages.exceptions import NotSupportedFileExtension
+
 requests_cache.install_cache('starwars_cache')
 ResourceType = Literal['people']
+ExportedFileExtension = Literal['csv']
 
 
-def get_api_resources(client: ApiClient, url: str, resource: ResourceType) -> list[dict]:
+def get_api_resources(client: ApiClient, url: str, resource: ResourceType):
     api_query = f'{url}/{resource}'
     api_resources = []
     is_next = True
@@ -22,7 +26,7 @@ def get_api_resources(client: ApiClient, url: str, resource: ResourceType) -> li
         response = client.get(api_query)
         for resource in response['results']:
             api_resources.append(resource)
-        if bool(response['next']):
+        if response['next']:
             api_query = response['next']
         else:
             is_next = False
@@ -41,7 +45,7 @@ class AbstractResource(ABC):
         self.__dict__.update(kwargs)
 
     @abstractmethod
-    def exported_fields(self):
+    def exported_fields(self) -> dict:
         ...
 
 
@@ -53,7 +57,7 @@ class StarWarsPlanet(AbstractResource):
     def __repr__(self):
         return f'Planet: {self.name}'
 
-    def exported_fields(self):
+    def exported_fields(self) -> dict:
         ...
 
 
@@ -75,7 +79,7 @@ class StarWarsPerson(AbstractResource):
         response = self.client.get(self.homeworld)
         return StarWarsPlanet(**response)
 
-    def exported_fields(self):
+    def exported_fields(self) -> dict:
         return {k: v for k, v in self.__dict__.items() if k not in DROPPED_PEOPLE_FIELDS}
 
 
@@ -133,17 +137,33 @@ class PeopleCollection(AbstractCollection):
         return self._collection[value]
 
 
-class CsvExporter:
-    def __init__(self, collection: AbstractCollection):
-        self.collection: AbstractCollection = collection
+def get_collection_exporter(extension: ExportedFileExtension) -> AbstractExporter:
+    factories = {
+        "csv": CSVExporter()
+    }
+    if extension in factories.keys():
+        return factories[extension]
+    else:
+        raise NotSupportedFileExtension(extension)
+
+
+class AbstractExporter:
+    def __init__(self):
+        self.collection: AbstractCollection | None = None
         self.filepath: str = ''
 
-    def export(self, export_dir: str = None) -> None:
-        filename = f'{uuid.uuid4().hex}.csv'
-        self.filepath = os.path.join(export_dir, filename)
-        collection_keys = self.collection[0].exported_fields().keys()
+    @abstractmethod
+    def export(self, collection: AbstractCollection, export_dir) -> None:
+        ...
+
+
+class CSVExporter(AbstractExporter):
+
+    def export(self, collection: AbstractCollection, export_dir: str) -> None:
+        self.collection = collection
+        self.filepath = os.path.join(export_dir, f'{uuid.uuid4().hex}.csv')
         with open(self.filepath, 'w', encoding='utf8', newline='') as f:
-            csv_writer = csv.DictWriter(f, fieldnames=collection_keys)
+            csv_writer = csv.DictWriter(f, fieldnames=self.collection[0].exported_fields().keys())
             csv_writer.writeheader()
             for resource in self.collection:
                 csv_writer.writerow(resource.exported_fields())
