@@ -1,3 +1,5 @@
+import re
+
 from django import template
 
 from starwars.settings import DEFAULT_PER_PAGE, DEFAULT_DISPLAY_MORE, QUERY_PER_PAGE, QUERY_COLUMN, QUERY_SORT_BY
@@ -18,7 +20,7 @@ def sort_by(request, field):
 def select_column(request, field):
     query = request.GET.copy()
     query_column_list = query.getlist(QUERY_COLUMN)
-    query_sort_by = query.get(QUERY_SORT_BY, '').replace('-', '')
+    query_sort_by = query.get(QUERY_SORT_BY, '').lstrip('-')
     columns_selected = bool(query_column_list)
 
     if field not in query_column_list:
@@ -49,3 +51,9 @@ def display_more(request):
     except ValueError:
         query[QUERY_PER_PAGE] = DEFAULT_PER_PAGE + DEFAULT_DISPLAY_MORE
     return query.urlencode()
+
+
+@register.simple_tag
+def normalize_name(s: str):
+    normalized_string = s.replace('_', " ").capitalize().strip()
+    return normalized_string

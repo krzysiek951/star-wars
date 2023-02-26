@@ -43,6 +43,7 @@ def test_client():
 
 def mocked_requests_get(*args, **kwargs):
     """ Represents mocked response from API. """
+
     class MockResponse:
         def __init__(self, json_data, status_code):
             self.json_data = json_data
@@ -59,10 +60,12 @@ def mocked_requests_get(*args, **kwargs):
     return MockResponse(None, 404)
 
 
+#
 @patch.object(Session, 'get', side_effect=mocked_requests_get)
 def test_get_api_resources(mock_get, test_client):
     """ Test whether the data from API is fetched correctly. """
-    response = get_api_resources(client=test_client, url=TEST_API_URL, resource='people')
+    with test_client:
+        response = get_api_resources(client=test_client, url=TEST_API_URL, resource='people')
     assert response == PEOPLE_PAGE_1['results'] + PEOPLE_PAGE_2['results']
 
 
