@@ -14,8 +14,8 @@ from starwars.starwars_explorer.exceptions import ResourceDoesNotExist
 from starwars.starwars_explorer.models import PeopleCollection, get_api_resources, get_collection_exporter, ResourceType
 
 from .models.collection_importer import get_collection_importer
-from .models.db_models import UserCollection
 from .models.transformations_director import TransformationsDirector
+from .models.db_models import UserCollection
 
 logger = logging.getLogger('__main__.' + __name__)
 
