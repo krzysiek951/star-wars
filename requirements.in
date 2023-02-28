@@ -6,3 +6,4 @@ petl
 python-dateutil
 coverage
 pytest
+pympler

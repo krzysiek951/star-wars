@@ -1,3 +1,7 @@
+class ResourceDoesNotExist(Exception):
+    ...
+
+
 class NotSupportedFileExtension(Exception):
 
     def __init__(self, file_extension):

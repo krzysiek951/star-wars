@@ -1,6 +1,9 @@
-from typing import Union
+from typing import Union, Optional, Callable
 import petl
-from starwars.pages.utils.utils import get_sort_name, is_order_reversed
+from dateutil import parser
+
+from starwars.starwars_explorer.models.client import ApiClient
+from starwars.starwars_explorer.utils.utils import get_sort_name, is_order_reversed, str_to_digit
 from starwars.settings import DEFAULT_PER_PAGE
 
 
@@ -25,13 +28,17 @@ def limit_to(collection: petl.Table, per_page: str = None) -> petl.Table:
     return petl.head(collection, results_per_page)
 
 
-def str_to_digit(value: str) -> Union[float, int, str]:
-    try:
-        number = float(value.replace(",", ""))
-        return number if not number.is_integer() else int(number)
-    except ValueError:
-        return value
-
-
 def to_number(collection: petl.Table, field: str) -> petl.Table:
     return petl.convert(collection, field, lambda x: str_to_digit(x))
+
+
+def drop_fields(collection: petl.Table, dropped_fields: list[str]) -> petl.Table:
+    return petl.cutout(collection, *dropped_fields)
+
+
+def resolve_url(collection: petl.Table, client: ApiClient, from_: str, to_: str) -> petl.Table:
+    return petl.convert(collection, from_, lambda x: client.get(x).get(to_, None))
+
+
+def add_column(collection: petl.Table, new_column_name: str, func: Callable, func_arg: str):
+    return petl.addfield(collection, new_column_name, lambda x: func(x[func_arg]))

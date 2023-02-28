@@ -3,19 +3,18 @@ from time import time
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-
 import petl
 
-from .client import ApiClient
-
-from starwars.settings import (COLLECTIONS_DIR, DEFAULT_PER_PAGE, API_BASE_URL, QUERY_PER_PAGE, QUERY_COLUMN,
+from starwars.settings import (COLLECTIONS_DIR, DEFAULT_PER_PAGE, QUERY_PER_PAGE, QUERY_COLUMN,
                                QUERY_SORT_BY)
-from starwars.starwars_explorer.exceptions import ResourceDoesNotExist
-from starwars.starwars_explorer.models import PeopleCollection, get_api_resources, get_collection_exporter, ResourceType
-
-from .models.collection_importer import get_collection_importer
-from .models.transformations_director import TransformationsDirector
+from .models.director import DisplayedDataDirector, StoredPeopleDataDirector
 from .models.db_models import UserCollection
+
+from starwars.starwars_explorer.models.exceptions import ResourceDoesNotExist
+from starwars.starwars_explorer.models.importer import get_data_importer
+from starwars.starwars_explorer.models.resource import SwapiResourceType, SwapiResource
+from starwars.starwars_explorer.models.exporter import get_data_exporter
+from starwars.starwars_explorer.models.client import ApiClient
 
 logger = logging.getLogger('__main__.' + __name__)
 
@@ -30,15 +29,13 @@ def home(request):
 
 def collection_details(request, collection_id):
     collection = get_object_or_404(UserCollection, pk=collection_id)
-    imported_data = get_collection_importer(collection.filepath).import_data()
-
-    transformations_director = TransformationsDirector(
+    imported_data = get_data_importer(collection.filepath).import_data()
+    displayed_data = DisplayedDataDirector(
         collection_data=imported_data,
         columns=request.GET.getlist(QUERY_COLUMN),
         per_page=request.GET.get(QUERY_PER_PAGE, DEFAULT_PER_PAGE),
         sort_by=request.GET.get(QUERY_SORT_BY, None),
-    )
-    displayed_data = transformations_director.transform()
+    ).transform()
     query_results = {
         'collection': collection,
         'collection_header': petl.header(imported_data),
@@ -50,25 +47,20 @@ def collection_details(request, collection_id):
 
 
 def fetch_starwars_people(request):
-    resource: ResourceType = 'people'
+    resource: SwapiResourceType = 'people'
     client = ApiClient()
-    start_timer = time()
     try:
         with client:
-            people = get_api_resources(client=client, url=API_BASE_URL, resource=resource)
-            people_collection = PeopleCollection(client=client, raw_data=people)
-        collection_exporter = get_collection_exporter('csv')
-        collection_exporter.export(people_collection, COLLECTIONS_DIR)
-        end_timer = time()
+            start_timer = time()
+            collection = SwapiResource(resource, client)
+            collection_exported = StoredPeopleDataDirector(collection, client).transform()
+            data_exporter = get_data_exporter('csv')
+            data_exporter.export(collection_exported, COLLECTIONS_DIR)
+            user_collection = UserCollection(name=resource, filepath=data_exporter.filepath).save()  # noqa
+            end_timer = time()
+            fetch_time = end_timer - start_timer
 
-        user_collection = UserCollection(
-            name=collection_exporter.collection.type,
-            filepath=collection_exporter.filepath,
-        )
-        user_collection.save()
-
-        messages.success(request,
-                         f'Created new resource collection of "{resource}" in {end_timer - start_timer:.2f} s.')
+        messages.success(request, f'Created new resource collection of "{resource}" in {fetch_time:.2f} s.')
         logger.info(f'Created new resource collection of "{resource}".')
 
     except ResourceDoesNotExist:
