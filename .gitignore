@@ -166,5 +166,6 @@ cython_debug/
 #.idea/.DS_Store
 
 # Other
-starwars_cache.sqlite
+cache_api_explorer.sqlite
+cache_starwars.sqlite
 *.csv

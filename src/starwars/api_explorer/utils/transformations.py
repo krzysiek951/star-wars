@@ -35,8 +35,8 @@ def drop_fields(collection: petl.Table, dropped_fields: list[str]) -> petl.Table
     return petl.cutout(collection, *dropped_fields)
 
 
-def resolve_url(collection: petl.Table, client: ApiClient, from_: str, to_: str) -> petl.Table:
-    return petl.convert(collection, from_, lambda x: client.get(x).get(to_, None))
+def resolve_url(collection: petl.Table, client: ApiClient, url_field: str, resolve_to: str) -> petl.Table:
+    return petl.convert(collection, url_field, lambda x: client.get(x).get(resolve_to, None))
 
 
 def add_column(collection: petl.Table, new_column_name: str, func: Callable, func_arg: str):
