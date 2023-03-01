@@ -7,14 +7,14 @@ import petl
 
 from starwars.settings import (COLLECTIONS_DIR, DEFAULT_PER_PAGE, QUERY_PER_PAGE, QUERY_COLUMN,
                                QUERY_SORT_BY)
-from .models.director import DisplayedDataDirector, StoredPeopleDataDirector
 from .models.db_models import UserCollection
 
 from starwars.starwars_explorer.models.exceptions import ResourceDoesNotExist
-from starwars.starwars_explorer.models.importer import get_data_importer
+from starwars.starwars_explorer.models.factories import get_data_importer
 from starwars.starwars_explorer.models.resource import SwapiResourceType, SwapiResource
-from starwars.starwars_explorer.models.exporter import get_data_exporter
+from starwars.starwars_explorer.models.factories import get_data_exporter
 from starwars.starwars_explorer.models.client import ApiClient
+from .models.factories import get_storage_director, get_dataview_director, get_api_resources
 
 logger = logging.getLogger('__main__.' + __name__)
 
@@ -30,8 +30,10 @@ def home(request):
 def collection_details(request, collection_id):
     collection = get_object_or_404(UserCollection, pk=collection_id)
     imported_data = get_data_importer(collection.filepath).import_data()
-    displayed_data = DisplayedDataDirector(
-        collection_data=imported_data,
+    displayed_data = get_dataview_director(
+        api=collection.api,
+        resource=collection.resource,
+        collection=imported_data,
         columns=request.GET.getlist(QUERY_COLUMN),
         per_page=request.GET.get(QUERY_PER_PAGE, DEFAULT_PER_PAGE),
         sort_by=request.GET.get(QUERY_SORT_BY, None),
@@ -46,17 +48,17 @@ def collection_details(request, collection_id):
     return render(request, 'collection.html', query_results)
 
 
-def fetch_starwars_people(request):
-    resource: SwapiResourceType = 'people'
+def fetch(request, api, resource):
+    resource: SwapiResourceType
     client = ApiClient()
     try:
         with client:
             start_timer = time()
-            collection = SwapiResource(resource, client)
-            collection_exported = StoredPeopleDataDirector(collection, client).transform()
+            collection = get_api_resources(client, api, resource)
+            collection_exported = get_storage_director(client, api, resource, collection).transform()
             data_exporter = get_data_exporter('csv')
             data_exporter.export(collection_exported, COLLECTIONS_DIR)
-            user_collection = UserCollection(name=resource, filepath=data_exporter.filepath).save()  # noqa
+            user_collection = UserCollection(api=api, resource=resource, filepath=data_exporter.filepath).save()  # noqa
             end_timer = time()
             fetch_time = end_timer - start_timer
 
@@ -65,6 +67,6 @@ def fetch_starwars_people(request):
 
     except ResourceDoesNotExist:
         messages.error(request, 'An error occurred while collecting data from API. Please try again later.')
-        logger.error(f'Unable to fetch the "{resource}" data from SWAPI.')
+        logger.error(f'Unable to fetch the "{resource}" data from {collection.api_name}.')
 
     return redirect('home')

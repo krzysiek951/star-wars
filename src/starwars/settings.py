@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from typing import Literal
+
 from django.contrib import messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -194,6 +196,7 @@ COLLECTIONS_DIR = 'starwars/media/collections/'
 QUERY_PER_PAGE = 'per_page'
 QUERY_COLUMN = 'column'
 QUERY_SORT_BY = 'sort_by'
+SUPPORTED_API = Literal['swapi']
 
 try:
     os.makedirs(COLLECTIONS_DIR)

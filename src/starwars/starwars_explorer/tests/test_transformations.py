@@ -1,4 +1,4 @@
-from starwars.pages.utils.transformations import str_to_digit
+from starwars.starwars_explorer.utils.utils import str_to_digit
 
 
 def test_str_to_digit():
