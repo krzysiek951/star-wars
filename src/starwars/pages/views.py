@@ -5,16 +5,19 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 import petl
 
-from starwars.settings import (COLLECTIONS_DIR, DEFAULT_PER_PAGE, QUERY_PER_PAGE, QUERY_COLUMN,
-                               QUERY_SORT_BY)
+from starwars.settings import (
+    COLLECTIONS_DIR,
+    DEFAULT_PER_PAGE,
+    QUERY_PER_PAGE,
+    QUERY_COLUMN,
+    QUERY_SORT_BY
+)
 from .models.db_models import UserCollection
 
-from starwars.starwars_explorer.models.exceptions import ResourceDoesNotExist
-from starwars.starwars_explorer.models.factories import get_data_importer
-from starwars.starwars_explorer.models.resource import SwapiResourceType, SwapiResource
-from starwars.starwars_explorer.models.factories import get_data_exporter
-from starwars.starwars_explorer.models.client import ApiClient
-from .models.factories import get_storage_director, get_dataview_director, get_api_resources
+from starwars.api_explorer.models.exceptions import ResourceDoesNotExist
+from starwars.api_explorer.models.factories import get_data_importer, get_data_exporter
+from starwars.api_explorer.models.client import ApiClient
+from .models.factories import get_storage_director, get_view_director, get_api_resources
 
 logger = logging.getLogger('__main__.' + __name__)
 
@@ -30,7 +33,7 @@ def home(request):
 def collection_details(request, collection_id):
     collection = get_object_or_404(UserCollection, pk=collection_id)
     imported_data = get_data_importer(collection.filepath).import_data()
-    displayed_data = get_dataview_director(
+    displayed_data = get_view_director(
         api=collection.api,
         resource=collection.resource,
         collection=imported_data,
@@ -49,7 +52,6 @@ def collection_details(request, collection_id):
 
 
 def fetch(request, api, resource):
-    resource: SwapiResourceType
     client = ApiClient()
     try:
         with client:

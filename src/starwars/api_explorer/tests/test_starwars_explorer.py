@@ -2,8 +2,8 @@ from unittest.mock import patch
 from requests import Session
 import pytest
 
-from starwars.starwars_explorer.models.client import ApiClient
-from starwars.starwars_explorer.utils.utils import str_date_to_iso
+from starwars.api_explorer.models.client import ApiClient
+from starwars.api_explorer.utils.utils import str_date_to_iso
 
 TEST_API_URL = 'https://swapi.dev/api'
 

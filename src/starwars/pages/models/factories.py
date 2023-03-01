@@ -1,20 +1,28 @@
 import petl
 
-from starwars.pages.models.director import AbstractStorageDirector, SwapiPeopleStorageDirector, DefaultStorageDirector, \
-    SwapiPeopleViewDirector, DefaultViewDirector, AbstractViewDirector
+from starwars.pages.models.director import (
+    AbstractStorageDirector,
+    SwapiPeopleStorageDirector,
+    DefaultStorageDirector,
+    SwapiPeopleViewDirector,
+    DefaultViewDirector,
+    AbstractViewDirector
+)
+from starwars.pages.models.resource import SwapiResource, TripAwayResource
 from starwars.settings import SUPPORTED_API
-from starwars.starwars_explorer.models.client import ApiClient
-from starwars.starwars_explorer.models.exceptions import NotSupportedAPI
-from starwars.starwars_explorer.models.resource import SwapiResourceType, SwapiResource, AbstractAPIResource, \
-    TripAwayResource
+from starwars.api_explorer.models.client import ApiClient
+from starwars.api_explorer.models.exceptions import NotSupportedAPI
+from starwars.api_explorer.models.resource import (
+    AbstractAPIResource,
+)
 
-EXPORTED_DATA_FACTORIES = {
+STORAGE_DIRECTOR_FACTORIES = {
     "swapi": {
         "people": SwapiPeopleStorageDirector,
     },
 }
 
-DISPLAYED_DATA_FACTORIES = {
+VIEW_DIRECTOR_FACTORIES = {
     "swapi": {
         "people": SwapiPeopleViewDirector,
     },
@@ -29,25 +37,25 @@ API_FACTORIES = {
 def get_storage_director(
         client: ApiClient,
         api: SUPPORTED_API,
-        resource: SwapiResourceType,
+        resource: str,
         collection: petl.Table,
 ) -> AbstractStorageDirector:
-    if api in EXPORTED_DATA_FACTORIES.keys() and resource in EXPORTED_DATA_FACTORIES[api].keys():
-        return EXPORTED_DATA_FACTORIES[api][resource](collection, client)
+    if resource in STORAGE_DIRECTOR_FACTORIES.get(api, {}).keys():
+        return STORAGE_DIRECTOR_FACTORIES[api][resource](collection, client)
     else:
         return DefaultStorageDirector(collection, client)
 
 
-def get_dataview_director(
+def get_view_director(
         api: SUPPORTED_API,
-        resource: SwapiResourceType,
+        resource: str,
         collection: petl.Table,
         sort_by: str,
         columns: list[str],
         per_page: str,
 ) -> AbstractViewDirector:
-    if api in DISPLAYED_DATA_FACTORIES.keys() and resource in DISPLAYED_DATA_FACTORIES[api].keys():
-        return DISPLAYED_DATA_FACTORIES[api][resource](collection, sort_by, columns, per_page)
+    if resource in VIEW_DIRECTOR_FACTORIES.get(api, {}).keys():
+        return VIEW_DIRECTOR_FACTORIES[api][resource](collection, sort_by, columns, per_page)
     else:
         return DefaultViewDirector(collection, sort_by, columns, per_page)
 

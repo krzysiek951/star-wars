@@ -1,30 +1,30 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from starwars.starwars_explorer.models.client import ApiClient
-from starwars.starwars_explorer.utils import transformations as trans
-from petl.util.base import Table as PetlTable
+import petl
 
-from starwars.starwars_explorer.utils.utils import str_date_to_iso
+from starwars.api_explorer.models.client import ApiClient
+from starwars.api_explorer.utils import transformations as trans
+from starwars.api_explorer.utils.utils import str_date_to_iso
 
 
 @dataclass
 class AbstractStorageDirector(ABC):
-    collection_data: PetlTable
+    collection_data: petl.Table
     client: ApiClient
 
     @abstractmethod
-    def transform(self) -> PetlTable:
+    def transform(self) -> petl.Table:
         ...
 
 
 class DefaultStorageDirector(AbstractStorageDirector):
-    def transform(self) -> PetlTable:
+    def transform(self) -> petl.Table:
         return self.collection_data
 
 
 class SwapiPeopleStorageDirector(AbstractStorageDirector):
-    def transform(self) -> PetlTable:
+    def transform(self) -> petl.Table:
         data = self.collection_data
         data = trans.resolve_url(data, self.client, 'homeworld', 'name')
         data = trans.add_column(data, 'date', str_date_to_iso, 'edited')
@@ -34,19 +34,19 @@ class SwapiPeopleStorageDirector(AbstractStorageDirector):
 
 @dataclass
 class AbstractViewDirector(ABC):
-    collection_data: PetlTable
+    collection_data: petl.Table
     sort_by: str = None
     columns: list[str] = None
     per_page: str = None
 
     @abstractmethod
-    def transform(self, **kwargs) -> PetlTable:
+    def transform(self, **kwargs) -> petl.Table:
         ...
 
 
 class DefaultViewDirector(AbstractViewDirector):
 
-    def transform(self) -> PetlTable:
+    def transform(self) -> petl.Table:
         data = self.collection_data
         data = trans.group_by(data, self.columns)
         data = trans.sort_by(data, self.sort_by)
@@ -56,7 +56,7 @@ class DefaultViewDirector(AbstractViewDirector):
 
 class SwapiPeopleViewDirector(AbstractViewDirector):
 
-    def transform(self) -> PetlTable:
+    def transform(self) -> petl.Table:
         data = self.collection_data
         data = trans.to_number(data, 'height')
         data = trans.to_number(data, 'mass')

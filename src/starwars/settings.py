@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'starwars.pages',
-    'starwars.starwars_explorer',
+    'starwars.api_explorer',
 ]
 
 MIDDLEWARE = [
@@ -197,6 +197,10 @@ QUERY_PER_PAGE = 'per_page'
 QUERY_COLUMN = 'column'
 QUERY_SORT_BY = 'sort_by'
 SUPPORTED_API = Literal['swapi']
+SWAPI_BASE_URL = 'https://swapi.dev/api'
+TRIPAWAY_BASE_URL = 'https://krzysiek951.pythonanywhere.com/api/'
+SwapiResourceType = Literal['people', 'planets', 'films', 'species', 'vehicles', 'starships']
+TripAwayResourceType = Literal['places']
 
 try:
     os.makedirs(COLLECTIONS_DIR)

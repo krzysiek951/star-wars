@@ -1,30 +1,12 @@
 from __future__ import annotations
-from abc import ABC
-from typing import Literal
 
-import petl
 import requests_cache
 
-from starwars.starwars_explorer.models.client import ApiClient
+from starwars.api_explorer.models.client import ApiClient
+from starwars.api_explorer.models.resource import AbstractAPIResource
+from starwars.settings import SwapiResourceType, SWAPI_BASE_URL, TripAwayResourceType, TRIPAWAY_BASE_URL
 
-requests_cache.install_cache('starwars_cache')
-SwapiResourceType = Literal['people', 'planets', 'films', 'species', 'vehicles', 'starships']
-TripAwayResourceType = Literal['places']
-SWAPI_BASE_URL = 'https://swapi.dev/api'
-TRIPAWAY_BASE_URL = 'https://krzysiek951.pythonanywhere.com/api/'
-
-
-class AbstractAPIResource(ABC, petl.Table):
-    api_name = None
-
-    def __init__(self, client: ApiClient, resource: str):
-        self.client = client
-        self.resource = resource
-        self.api_url = None
-
-    @property
-    def resource_url(self):
-        return f'{self.api_url}/{self.resource}'
+requests_cache.install_cache('cache_starwars')
 
 
 class SwapiResource(AbstractAPIResource):

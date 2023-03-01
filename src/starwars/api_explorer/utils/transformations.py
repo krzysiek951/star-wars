@@ -1,9 +1,8 @@
-from typing import Union, Optional, Callable
+from typing import Callable
 import petl
-from dateutil import parser
 
-from starwars.starwars_explorer.models.client import ApiClient
-from starwars.starwars_explorer.utils.utils import get_sort_name, is_order_reversed, str_to_digit
+from starwars.api_explorer.models.client import ApiClient
+from starwars.api_explorer.utils.utils import get_sort_name, is_order_reversed, str_to_digit
 from starwars.settings import DEFAULT_PER_PAGE
 
 

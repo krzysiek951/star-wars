@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import ContextManager
 import requests
 
-from starwars.starwars_explorer.models.exceptions import ResourceDoesNotExist
+from starwars.api_explorer.models.exceptions import ResourceDoesNotExist
 
 
 class ApiClient(ContextManager):
