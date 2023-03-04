@@ -9,25 +9,25 @@ from starwars.api_explorer.models.exceptions import NotSupportedFileExtension
 
 ExportedFileExtension = Literal['csv']
 
-IMPORTER_FACTORIES = {
+IMPORTER_FACTORY = {
     "csv": CSVImporter
 }
 
-EXPORTER_FACTORIES = {
+EXPORTER_FACTORY = {
     "csv": CSVExporter
 }
 
 
 def get_data_importer(filepath: FieldFile) -> AbstractImporter:
-    extension = get_file_extension(filepath)  # TODO: Move to utils
-    if extension in IMPORTER_FACTORIES.keys():
-        return IMPORTER_FACTORIES[extension](filepath)
+    extension = get_file_extension(filepath)
+    if extension in IMPORTER_FACTORY.keys():
+        return IMPORTER_FACTORY[extension](filepath)
     else:
         raise NotSupportedFileExtension(extension)
 
 
 def get_data_exporter(extension: ExportedFileExtension) -> AbstractExporter:
-    if extension in EXPORTER_FACTORIES.keys():
-        return EXPORTER_FACTORIES[extension]()
+    if extension in EXPORTER_FACTORY.keys():
+        return EXPORTER_FACTORY[extension]()
     else:
         raise NotSupportedFileExtension(extension)
