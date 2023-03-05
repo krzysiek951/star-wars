@@ -17,35 +17,35 @@
 </div>
 <div class="row pt-2">
     <div class="col">
-        <a href="{% url 'fetch' api='swapi' resource='people' %}" class="btn btn-primary" role="button"
+        <a href="{% url 'swapi_custom_fetch' resource='people' %}" class="btn btn-primary" role="button"
            aria-pressed="true">people
         </a>
     </div>
     <div class="col">
-        <a href="{% url 'fetch' api='swapi' resource='planets' %}" class="btn btn-primary" role="button"
+        <a href="{% url 'swapi_default_fetch' resource='planets' %}" class="btn btn-primary" role="button"
            aria-pressed="true">planets
         </a>
     </div>
     <div class="col">
-        <a href="{% url 'fetch' api='swapi' resource='films' %}" class="btn btn-primary" role="button"
+        <a href="{% url 'swapi_default_fetch' resource='films' %}" class="btn btn-primary" role="button"
            aria-pressed="true">films
         </a>
     </div>
     <div class="col">
-        <a href="{% url 'fetch' api='swapi' resource='species' %}" class="btn btn-primary" role="button"
+        <a href="{% url 'swapi_default_fetch' resource='species' %}" class="btn btn-primary" role="button"
            aria-pressed="true">species
         </a>
     </div>
     <div class="col">
-        <a href="{% url 'fetch' api='swapi' resource='vehicles' %}" class="btn btn-primary" role="button"
+        <a href="{% url 'swapi_default_fetch' resource='vehicles' %}" class="btn btn-primary" role="button"
            aria-pressed="true">vehicles</a>
     </div>
     <div class="col">
-        <a href="{% url 'fetch' api='swapi' resource='starships' %}" class="btn btn-primary" role="button"
+        <a href="{% url 'swapi_default_fetch' resource='starships' %}" class="btn btn-primary" role="button"
            aria-pressed="true">starships</a>
     </div>
         <div class="col">
-        <a href="{% url 'fetch' api='tripaway' resource='places' %}" class="btn btn-primary" role="button"
+        <a href="{% url 'tripaway_default_fetch' resource='places' %}" class="btn btn-primary" role="button"
            aria-pressed="true">TripAway places</a>
     </div>
 </div>

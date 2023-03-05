@@ -12,7 +12,7 @@ SampleAPIResourceType = Literal['people', 'planets', 'films', 'species', 'vehicl
 SAMPLE_API_URL = 'https://swapi.dev/api'
 
 
-class AbstractAPIResource(ABC, petl.Table):
+class AbstractAPIConnector(ABC, petl.Table):
     api_name = None
 
     def __init__(self, client: ApiClient, resource: str):
@@ -25,7 +25,7 @@ class AbstractAPIResource(ABC, petl.Table):
         return f'{self.api_url}/{self.resource}'
 
 
-class SampleAPIResource(AbstractAPIResource):
+class SampleAPIConnector(AbstractAPIConnector):
     api_name = 'SWAPI'
 
     def __init__(self, client: ApiClient, resource: SampleAPIResourceType):

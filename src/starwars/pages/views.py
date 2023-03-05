@@ -1,23 +1,20 @@
 import logging
-from time import time
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
 import petl
 
 from starwars.settings import (
-    COLLECTIONS_DIR,
     DEFAULT_PER_PAGE,
     QUERY_PER_PAGE,
     QUERY_COLUMN,
     QUERY_SORT_BY
 )
+from .utils.fetch import fetch_api_data
 from .models.db_models import UserCollection
-
-from starwars.api_explorer.models.exceptions import ResourceDoesNotExist
-from starwars.api_explorer.models.factories import get_data_importer, get_data_exporter
-from starwars.api_explorer.models.client import ApiClient
-from .models.factories import get_storage_director, get_view_director, get_api_resources
+from .models.connector import SwapiConnector, TripAwayConnector
+from .models.storage_director import SwapiPeopleStorageDirector
+from .models.factories import get_view_director
+from starwars.api_explorer.models.factories import get_data_importer
 
 logger = logging.getLogger('__main__.' + __name__)
 
@@ -51,24 +48,29 @@ def collection_details(request, collection_id):
     return render(request, 'collection.html', query_results)
 
 
-def fetch(request, api, resource):
-    client = ApiClient()
-    try:
-        with client:
-            start_timer = time()
-            collection = get_api_resources(client, api, resource)
-            collection_exported = get_storage_director(client, api, resource, collection).transform()
-            data_exporter = get_data_exporter('csv')
-            data_exporter.export(collection_exported, COLLECTIONS_DIR)
-            user_collection = UserCollection(api=api, resource=resource, filepath=data_exporter.filepath).save()  # noqa
-            end_timer = time()
-            fetch_time = end_timer - start_timer
+def swapi_default_fetch(request, resource):
+    fetch_api_data(
+        request,
+        resource,
+        connector=SwapiConnector(),
+    )
+    return redirect('home')
 
-        messages.success(request, f'Created new resource collection of "{resource}" in {fetch_time:.2f} s.')
-        logger.info(f'Created new resource collection of "{resource}".')
 
-    except ResourceDoesNotExist:
-        messages.error(request, 'An error occurred while collecting data from API. Please try again later.')
-        logger.error(f'Unable to fetch the "{resource}" data from {collection.api_name}.')
+def swapi_custom_fetch(request, resource):
+    fetch_api_data(
+        request,
+        resource,
+        connector=SwapiConnector(),
+        storage_director=SwapiPeopleStorageDirector()
+    )
+    return redirect('home')
 
+
+def tripaway_default_fetch(request, resource):
+    fetch_api_data(
+        request,
+        resource,
+        connector=TripAwayConnector(),
+    )
     return redirect('home')

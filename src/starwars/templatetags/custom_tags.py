@@ -1,5 +1,3 @@
-import re
-
 from django import template
 
 from starwars.settings import DEFAULT_PER_PAGE, DEFAULT_DISPLAY_MORE, QUERY_PER_PAGE, QUERY_COLUMN, QUERY_SORT_BY

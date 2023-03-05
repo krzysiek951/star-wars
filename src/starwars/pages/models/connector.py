@@ -3,16 +3,16 @@ from __future__ import annotations
 import requests_cache
 
 from starwars.api_explorer.models.client import ApiClient
-from starwars.api_explorer.models.resource import AbstractAPIResource
+from starwars.api_explorer.models.connector import AbstractAPIConnector
 from starwars.settings import SwapiResourceType, SWAPI_BASE_URL, TripAwayResourceType, TRIPAWAY_BASE_URL
 
 requests_cache.install_cache('cache_starwars')
 
 
-class SwapiResource(AbstractAPIResource):
+class SwapiConnector(AbstractAPIConnector):
     api_name = 'SWAPI'
 
-    def __init__(self, client: ApiClient, resource: SwapiResourceType):
+    def __init__(self, client: ApiClient = None, resource: SwapiResourceType = None):
         super().__init__(client, resource)
         self.api_url = SWAPI_BASE_URL
 
@@ -29,10 +29,10 @@ class SwapiResource(AbstractAPIResource):
                 yield resource_data
 
 
-class TripAwayResource(AbstractAPIResource):
+class TripAwayConnector(AbstractAPIConnector):
     api_name = 'TripAway'
 
-    def __init__(self, client: ApiClient, resource: TripAwayResourceType):
+    def __init__(self, client: ApiClient = None, resource: TripAwayResourceType = None):
         super().__init__(client, resource)
         self.api_url = TRIPAWAY_BASE_URL
 
